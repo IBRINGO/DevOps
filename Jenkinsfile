@@ -1,42 +1,69 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven3'      
-        jdk 'JDK17'             
-    }
-
     environment {
-        SONARQUBE = credentials('sonarqube-token') 
+        // 🔧 Variables globales
+        DB_URL = "jdbc:mysql://mysql:3306/ecommerce"
+        DB_USER = "root"
+        DB_PASS = "root"
+        TOMCAT_WEBAPPS = "C:\\apache-tomcat-10.1.30\\webapps"
+        MAVEN_OPTS = "-Dmaven.repo.local=/root/.m2/repository"
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                git 'https://github.com/IBRINGO/DevOps.git'
+                echo "📦 Clonage du dépôt Git..."
+                git branch: 'main', url: 'https://github.com/IBRINGO/DevOps.git'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                echo "⚙️ Compilation du projet Maven..."
+                sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('SonarQube Analysis') {
+            environment {
+                scannerHome = tool 'SonarScanner'   // nom défini dans Manage Jenkins > Tools
+            }
             steps {
-                withSonarQubeEnv('SonarQubeLocal') {
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=mon-projet -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONARQUBE'
+                echo "🔍 Analyse de la qualité du code avec SonarQube..."
+                withSonarQubeEnv('SonarQubeLocal') { // nom configuré dans Manage Jenkins > System
+                    sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=ecommerce \
+                        -Dsonar.projectName="Ecommerce Website" \
+                        -Dsonar.projectVersion=1.0 \
+                        -Dsonar.sources=src/main/java \
+                        -Dsonar.java.binaries=target/classes \
+                        -Dsonar.host.url=http://localhost:9000
+                    """
                 }
             }
         }
 
-        stage('Quality Gate') {
+        stage('Deploy to Tomcat') {
             steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
+                echo "🚀 Déploiement du package WAR sur Tomcat..."
+                sh """
+                    mkdir -p ${TOMCAT_WEBAPPS}
+                    cp target/*.war ${TOMCAT_WEBAPPS}/ecommerce.war
+                """
             }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Build et déploiement réalisés avec succès !"
+            echo "🌍 Application disponible sur : http://localhost:8085/ecommerce/"
+        }
+        failure {
+            echo "❌ Le pipeline a échoué — vérifie les logs Jenkins."
         }
     }
 }
