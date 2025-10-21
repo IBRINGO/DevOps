@@ -37,18 +37,22 @@ pipeline {
             steps {
                 echo "🔍 Analyse de la qualité du code avec SonarQube..."
                 withSonarQubeEnv('SonarQubeLocal') {
-                    bat """
-                        "%scannerHome%\\bin\\sonar-scanner.bat" ^
-                        -Dsonar.projectKey=ecommerce ^
-                        -Dsonar.projectName="Ecommerce Website" ^
-                        -Dsonar.projectVersion=1.0 ^
-                        -Dsonar.sources=src\\main\\java ^
-                        -Dsonar.java.binaries=target\\classes ^
-                        -Dsonar.host.url=http://localhost:9000
-                    """
+                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                        bat """
+                            "%scannerHome%\\bin\\sonar-scanner.bat" ^
+                            -Dsonar.projectKey=ecommerce ^
+                            -Dsonar.projectName="Ecommerce Website" ^
+                            -Dsonar.projectVersion=1.0 ^
+                            -Dsonar.sources=src\\main\\java ^
+                            -Dsonar.java.binaries=target\\classes ^
+                            -Dsonar.host.url=http://localhost:9000 ^
+                            -Dsonar.login=%SONAR_TOKEN%
+                        """
+                    }
                 }
             }
         }
+
 
         stage('Deploy to Tomcat') {
             steps {
