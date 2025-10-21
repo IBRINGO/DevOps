@@ -38,7 +38,7 @@ pipeline {
                 echo "🔍 Analyse de la qualité du code avec SonarQube..."
                 withSonarQubeEnv('SonarQubeLocal') {
                     bat """
-                        "%scannerHome%\\sonar-scanner.bat" ^
+                        "%scannerHome%\\bin\\sonar-scanner.bat" ^
                         -Dsonar.projectKey=ecommerce ^
                         -Dsonar.projectName="Ecommerce Website" ^
                         -Dsonar.projectVersion=1.0 ^
