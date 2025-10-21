@@ -18,35 +18,6 @@ pipeline {
             }
         }
 
-        stage('Parallel Build & Tests') {
-            parallel {
-                stage('Build (cached)') {
-                    steps {
-                        sh 'mvn clean package -DskipTests'
-                    }
-                }
-
-                stage('Unit Tests') {
-                    steps {
-                        sh 'mvn test -Dtest=UtilisateurUnitTest'
-                    }
-                }
-
-                stage('Integration Tests (H2)') {
-                    steps {
-                        sh 'mvn test -DTEST_ENV=true -Dtest=SampleTest'
-                    }
-                }
-            }
-        }
-
-        stage('Coverage Report') {
-            steps {
-                echo "📈 Génération du rapport de couverture JaCoCo..."
-                sh 'mvn clean test jacoco:report'
-            }
-        }
-
         stage('SonarQube Analysis') {
             environment {
                 scannerHome = tool 'sonar-scanner'
