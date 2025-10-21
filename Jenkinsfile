@@ -14,7 +14,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo "📦 Récupération du code source..."
-                git branch: 'main', url: 'https://github.com/abdellatif-rhaymi/EcommerceWebsite.git'
+                git branch: 'main', url: 'https://github.com/IBRINGO/DevOps.git'
             }
         }
 
