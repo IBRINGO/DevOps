@@ -37,7 +37,7 @@ pipeline {
             steps {
                 echo "🔍 Analyse de la qualité du code avec SonarQube..."
                 withSonarQubeEnv('SonarQubeLocal') {
-                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'jenkins-token', variable: 'SONAR_TOKEN')]) {
                         bat """
                             "%scannerHome%\\bin\\sonar-scanner.bat" ^
                             -Dsonar.projectKey=ecommerce ^
