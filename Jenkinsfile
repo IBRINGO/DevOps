@@ -9,6 +9,10 @@ pipeline {
         TOMCAT_WEBAPPS = "C:\\apache-tomcat-10.1.30\\webapps"
         MAVEN_OPTS = "-Dmaven.repo.local=/root/.m2/repository"
     }
+    tools {
+        maven 'maven'   // nom défini dans Manage Jenkins > Tools
+        jdk 'JDK17'      // optionnel si tu veux forcer la version du JDK
+    }
 
     stages {
 
