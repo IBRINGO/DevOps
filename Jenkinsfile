@@ -6,8 +6,9 @@ pipeline {
         DB_USER = "root"
         DB_PASS = "root"
         TOMCAT_WEBAPPS = "C:\\apache-tomcat-10.1.30\\webapps"
-        MAVEN_OPTS = "-Dmaven.repo.local=/root/.m2/repository"
+        MAVEN_OPTS = "-Dmaven.repo.local=C:\\Users\\Administrator\\.m2\\repository"
     }
+
     tools {
         maven 'Maven3' 
     }
@@ -24,7 +25,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "⚙️ Compilation du projet Maven..."
-                sh 'mvn clean package -DskipTests'
+                bat 'mvn clean package -DskipTests'
             }
         }
 
@@ -35,13 +36,13 @@ pipeline {
             steps {
                 echo "🔍 Analyse de la qualité du code avec SonarQube..."
                 withSonarQubeEnv('SonarQubeLocal') {
-                    sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=ecommerce \
-                        -Dsonar.projectName="Ecommerce Website" \
-                        -Dsonar.projectVersion=1.0 \
-                        -Dsonar.sources=src/main/java \
-                        -Dsonar.java.binaries=target/classes \
+                    bat """
+                        "%scannerHome%\\bin\\sonar-scanner.bat" ^
+                        -Dsonar.projectKey=ecommerce ^
+                        -Dsonar.projectName="Ecommerce Website" ^
+                        -Dsonar.projectVersion=1.0 ^
+                        -Dsonar.sources=src\\main\\java ^
+                        -Dsonar.java.binaries=target\\classes ^
                         -Dsonar.host.url=http://localhost:9000
                     """
                 }
@@ -51,9 +52,9 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 echo "🚀 Déploiement du package WAR sur Tomcat..."
-                sh """
-                    mkdir -p ${TOMCAT_WEBAPPS}
-                    cp target/*.war ${TOMCAT_WEBAPPS}/ecommerce.war
+                bat """
+                    if not exist "%TOMCAT_WEBAPPS%" mkdir "%TOMCAT_WEBAPPS%"
+                    copy target\\*.war "%TOMCAT_WEBAPPS%\\ecommerce.war" /Y
                 """
             }
         }
