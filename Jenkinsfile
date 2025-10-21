@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // 🔧 Variables globales
         DB_URL = "jdbc:mysql://mysql:3306/ecommerce"
         DB_USER = "root"
         DB_PASS = "root"
@@ -10,7 +9,7 @@ pipeline {
         MAVEN_OPTS = "-Dmaven.repo.local=/root/.m2/repository"
     }
     tools {
-        maven 'maven'   // nom défini dans Manage Jenkins > Tools
+        maven 'Maven3' 
     }
 
     stages {
@@ -31,11 +30,11 @@ pipeline {
 
         stage('SonarQube Analysis') {
             environment {
-                scannerHome = tool 'SonarScanner'   // nom défini dans Manage Jenkins > Tools
+                scannerHome = tool 'SonarScanner'
             }
             steps {
                 echo "🔍 Analyse de la qualité du code avec SonarQube..."
-                withSonarQubeEnv('SonarQubeLocal') { // nom configuré dans Manage Jenkins > System
+                withSonarQubeEnv('SonarQubeLocal') {
                     sh """
                         ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=ecommerce \
