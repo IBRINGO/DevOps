@@ -40,11 +40,6 @@ pipeline {
             }
         }
 
-        stage('Publish Test Report') {
-            steps {
-                junit '**/target/surefire-reports/*.xml'
-            }
-        }
 
         stage('Incremental Deploy to Tomcat') {
             when {
